@@ -1,0 +1,3 @@
+depot;schweppes car|cargo 1,refrigerated car|cargo 1,passenger car|people 2,coal car|cargo 0
+coal mine;schweppes car|cargo 0,refrigerated car|cargo 0,passenger car|people 2,coal car|cargo 1
+eastern tracks;coal car|cargo 0
