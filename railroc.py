@@ -52,20 +52,27 @@ def parse_input(input_file):
     return hub_dict, limit_dict
 
 def generate_operation(in_dict, placements_dict, limit_dict):
+    # Pick a location to move a car from:
     filt_dict = dict(filter(lambda pair : len(placements_dict[pair[0]]) > 0, in_dict.items()))
     hub1, car_dict1 = random.choice(list(filt_dict.items()))
+    # Pick a car to move from the location:
     car1 = random.choice(placements_dict[hub1])
     meta1 = car_dict1[car1]
     type1, nmbr = meta1.split() # type1 is not used
     state1 = 'empty' if nmbr == '0' else 'full' if nmbr == '1' else random.choice(['empty', 'full'])
+    # Pick a destination to move the car to:
     filt_dict = dict(filter(lambda pair : car1 in pair[1], in_dict.items()))
     filt_dict.pop(hub1)
     hub2, car_dict2 = random.choice(list(filt_dict.items())) # car_dict2 is not used
     print(f'We need you to bring the {state1} {car1} from the {hub1} to the {hub2}.')
+    # Check if the destination has room. If not, select a car to move to another location:
     if (int(limit_dict[hub2]) - len(placements_dict[hub2])) < 1:
-        filt_dict = dict(filter(lambda pair : int(limit_dict[pair[0]]) > len(pair[1]), placements_dict.items()))
+        car2 = random.choice(placements_dict[hub2]) # choose a car to move
+        filt_dict = dict(filter(lambda pair : int(limit_dict[pair[0]]) > len(pair[1]),
+                                placements_dict.items())) # look for hubs with space available
+        filt_dict = dict(filter(lambda pair : car2 in in_dict[pair[0]],
+                                filt_dict.items())) # only look at hubs that can hold the car
         hub3 = random.choice(list(filt_dict))
-        car2 = random.choice(placements_dict[hub2])
         print(f'It seems that the {hub2} is out of room, so we need you to move the {car2} to the {hub3} first.')
         placements_dict[hub2].remove(car2)
         placements_dict[hub3] = placements_dict[hub3] + [car2]
@@ -73,20 +80,38 @@ def generate_operation(in_dict, placements_dict, limit_dict):
     placements_dict[hub2] = placements_dict[hub2] + [car1]
     return placements_dict
 
-def start_menu(hub_dict, car_placements, limit_dict):
-    points = 0
+def calc_points(points, streak):
+    if streak % 10 == 0:
+        points = points + 2
+        if streak % 100 == 0:
+            points = points + 20
+            if streak % 1000 == 0:
+                points = points + 200
+    points = points + 1
+    return points
+
+def start_menu(hub_dict, current_placements, limit_dict):
     command = ''
+    missions = 0
+    points = 0
+    streak = 0
     while command != 'abort':
         command = ''
-        plural = '' if points == 1 else 's'
-        print(f'You have completed {points} mission{plural}.')
+        plural = '' if missions == 1 else 's'
+        print(f'You have completed {missions} mission{plural}, and your current streak is {streak}.')
+        print(f'Your points: {points}')
         print(f'Your cars are located in the following hubs:\n')
-        print_placements(car_placements)
+        print_placements(current_placements)
         print('Current mission:')
-        car_placements = generate_operation(hub_dict, car_placements, limit_dict)
-        while command != 'done' and command != 'abort':
+        current_placements = generate_operation(hub_dict, current_placements, limit_dict)
+        while command != 'done' and command != 'skip' and command != 'abort':
             command = input('Get back to us when you are done (done/abort): ')
-            points = points + 1 if command == 'done' else points
+            streak = streak + 1 if command == 'done' else 0
+            missions = missions + 1 if command == 'done' else missions
+            points = calc_points(points, streak) if command == 'done' else points
+            print(current_placements)
+#             current_placements = current_placements if command == 'done' else current_placements
+            print(current_placements)
         print()
     print('See you next time!')
 
