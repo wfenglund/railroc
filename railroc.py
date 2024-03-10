@@ -106,7 +106,7 @@ def start_menu(hub_dict, current_placements, limit_dict):
         current_placements = generate_operation(hub_dict, current_placements, limit_dict)
         while command != 'done' and command != 'skip' and command != 'abort':
             command = input('Get back to us when you are done (done/abort): ')
-            streak = streak + 1 if command == 'done' else 0
+            streak = streak + 1 if command == 'done' else 0 if command == 'skip' else streak
             missions = missions + 1 if command == 'done' else missions
             points = calc_points(points, streak) if command == 'done' else points
             print(current_placements)
