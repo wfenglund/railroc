@@ -109,9 +109,9 @@ def start_menu(hub_dict, current_placements, limit_dict):
             streak = streak + 1 if command == 'done' else 0 if command == 'skip' else streak
             missions = missions + 1 if command == 'done' else missions
             points = calc_points(points, streak) if command == 'done' else points
-            print(current_placements)
+#             print(current_placements)
 #             current_placements = current_placements if command == 'done' else current_placements
-            print(current_placements)
+#             print(current_placements)
         print()
     print('See you next time!')
 
